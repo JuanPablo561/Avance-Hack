@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Avance Hack · Visión de prendas</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/static/estilos.css" />
+    <script src="/static/app.js" defer></script>
+    <script src="/static/cuenta.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a class="marca" href="/">AVANCE HACK <span>MK3</span></a
+        ><span class="etiqueta">FORMA → DETALLE → CONTEXTO</span>
+      </header>
+      <h1 class="titulo-app">Prendas en contexto</h1>
+    <section id="cuenta" aria-labelledby="tituloCuenta">
+        <h2 id="tituloCuenta">Tu espacio de análisis</h2>
+        <p id="sesion" role="status">
+          Inicia sesión o crea una cuenta para analizar y guardar resultados.
+        </p>
+        <form id="auth">
+          <label for="nombre">Nombre (para registrarte)</label
+          ><input id="nombre" name="name" maxlength="100" autocomplete="name" />
+          <label for="correo">Correo</label
+          ><input
+            id="correo"
+            type="email"
+            name="email"
+            maxlength="150"
+            required
+            autocomplete="email"
+          />
+          <label for="clave">Contraseña</label
+          ><input
+            id="clave"
+            type="password"
+            name="password"
+            required
+            maxlength="128"
+            autocomplete="current-password"
+          />
+          <div class="acciones">
+            <button class="boton principal" type="submit">Iniciar sesión</button
+            ><button class="boton" type="button" id="registro">
+              Crear cuenta
+            </button>
+          </div>
+          <p>
+            Para crear una cuenta, usa al menos 12 caracteres en la contraseña.
+          </p>
+        </form>
+        <button class="boton" id="salir" hidden>Cerrar sesión</button>
+        <p id="authError" role="alert" hidden></p>
+      </section>
+      <section id="herramienta" hidden>
+        <div class="introduccion">
+          <p class="sobre">VISIÓN POR COMPUTADORA / 03</p>
+          <h2 class="titulo-escena">Una escena.<br />Varias prendas.</h2>
+          <p>
+            Localiza prendas y accesorios dentro de una foto.<br />Explora qué
+            encuentra el modelo y dónde lo encuentra.
+          </p>
+        </div>
+        <div class="espacio">
+          <section class="visor" aria-labelledby="tituloFoto">
+            <div class="cabecera">
+              <h2 id="tituloFoto">01 / Tu imagen</h2>
+              <span id="dimensiones">JPEG · PNG · WEBP</span>
+            </div>
+            <div id="zona">
+              <div id="vacio">
+                <span class="mira" aria-hidden="true">⌖</span>
+                <h3>La escena empieza aquí</h3>
+                <p>
+                  Arrastra una foto o selecciona un archivo.<br />Prueba con una
+                  persona o varias prendas sobre una mesa.
+                </p>
+              </div>
+              <canvas
+                id="lienzo"
+                hidden
+                aria-label="Imagen con cajas numeradas de las prendas detectadas"
+              ></canvas>
+            </div>
+            <div class="acciones">
+              <button class="boton principal" id="elegir" type="button">
+                Seleccionar foto</button
+              ><input
+                id="archivo"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+              />
+              <button class="boton" id="tomar" type="button">Tomar foto</button
+              ><input
+                id="camara"
+                type="file"
+                accept="image/*"
+                capture="environment"
+              />
+            </div>
+            <p class="ayuda">
+              Hasta 14 MB y 20 megapíxeles. En móvil, “Tomar foto” abre la
+              cámara compatible; en escritorio puede abrir el selector de
+              archivos.
+            </p>
+          </section>
+          <aside aria-labelledby="tituloResultados">
+            <div class="cabecera">
+              <h2 id="tituloResultados">02 / Lo que encuentra</h2>
+              <span id="total">—</span>
+            </div>
+            <p id="estado" role="status" aria-live="polite">
+              Selecciona una foto para comenzar.
+            </p>
+            <p id="error" role="alert" hidden></p>
+            <ol id="resultados" aria-label="Prendas detectadas"></ol>
+            <div class="ajuste">
+              <label for="umbral"
+                >Puntuación mínima
+                <output id="valor" for="umbral">0.15</output></label
+              ><input
+                id="umbral"
+                type="range"
+                min="0.01"
+                max="0.90"
+                step="0.01"
+                value="0.15"
+              />
+              <p>
+                Un valor bajo muestra más propuestas y puede incluir errores.
+                Cambiarlo requiere volver a analizar.
+              </p>
+            </div>
+            <button id="analizar" class="boton principal" disabled>
+              Analizar imagen
+            </button>
+            <button id="descargar" class="boton" disabled>
+              Exportar resultados
+            </button>
+            <p class="nota">
+              Las puntuaciones del detector no son porcentajes de acierto.
+              Selecciona un resultado para resaltar su ubicación.
+            </p>
+          </aside>
+        </div>
+        <section aria-labelledby="tituloHistorial" id="historial">
+          <h2 id="tituloHistorial">03 / Historial personal</h2>
+          <p>
+            Se guardan categorías, cajas y nombre del archivo; las fotografías
+            no se almacenan.
+          </p>
+          <ul id="listaHistorial"></ul>
+          <button class="boton" id="anterior">Anterior</button
+          ><span id="pagina"></span
+          ><button class="boton" id="siguiente">Siguiente</button>
+          <p id="historyError" role="alert" hidden></p>
+        </section>
+      </section>
+      <footer>
+        <p>
+          <strong>Contexto, paso a paso.</strong> Detección de varias prendas
+          con OWL-ViT. Puede omitir objetos, confundir categorías o detectar
+          prendas donde no las hay.
+        </p>
+        <p>
+          Las fotos se procesan en el equipo que ejecuta el servidor y no se
+          guardan. Los resultados se guardan en tu cuenta. El modelo se descarga
+          en la primera ejecución.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

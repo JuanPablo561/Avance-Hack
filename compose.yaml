@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: avance
+      POSTGRES_USER: avance
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U avance -d avance]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  neural:
+    build: ./neural
+    environment:
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+    volumes:
+      - modelos:/app/.modelos
+    healthcheck:
+      test:
+        [
+          CMD,
+          python,
+          -c,
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')",
+        ]
+      interval: 15s
+      timeout: 5s
+      start_period: 300s
+      retries: 40
+  app:
+    build: .
+    ports:
+      - 127.0.0.1:3000:3000
+    environment:
+      DATABASE_URL: postgresql://avance:${POSTGRES_PASSWORD}@db:5432/avance
+      NEURAL_URL: http://neural:8000
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
+    depends_on:
+      db:
+        condition: service_healthy
+      neural:
+        condition: service_healthy
+volumes:
+  postgres:
+  modelos:
